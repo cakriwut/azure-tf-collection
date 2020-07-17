@@ -10,6 +10,16 @@ variable "vm_to_create" {
     description = "How many VM to create"
 }
 
+variable "vm_base_name" {
+    description = "Basename"
+    default = "streamer"
+}
+
+variable "vm_size" {
+   description = "VM size"
+   default = "Standard_B4ms"
+}
+
 variable "admin_username" {
     description = "User"
 }
@@ -18,7 +28,8 @@ variable "admin_password" {
     description = "Password"
 }
 
-variable "vm_size" {
-   description = "VM size"
-   default = "Standard_B4ms"
+variable "tags" {
+    description = "Deployment tags"
+    type        = map(string)
 }
+

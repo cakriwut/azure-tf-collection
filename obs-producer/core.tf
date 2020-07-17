@@ -16,7 +16,7 @@ resource "azurerm_subnet" "streamer" {
   name                  = "steamer-subnet"
   resource_group_name   = azurerm_resource_group.streamer.name
   virtual_network_name  = azurerm_virtual_network.streamer.name
-  address_prefix        = "10.0.2.0/24"
+  address_prefixes      = ["10.0.2.0/24"]
 }
 
 resource "azurerm_network_security_group" "streamer" {
