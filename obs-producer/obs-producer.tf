@@ -37,9 +37,9 @@ resource "azurerm_windows_virtual_machine" "streamer" {
    size = var.vm_size
    admin_username =  var.admin_username
    admin_password = var.admin_password
-
-
    custom_data = filebase64("init.ps1")
+
+   provision_vm_agent = true
 
    additional_unattend_content {
         setting = "AutoLogon"
@@ -53,14 +53,14 @@ resource "azurerm_windows_virtual_machine" "streamer" {
 
    source_image_reference {
        publisher = "MicrosoftWindowsDesktop"
-       offer = "windows-10-2004-vhd-client-office-prod-stage"
-       sku = "20h1-evd-o365pp"
+       offer = "Windows-10"
+       sku = "20h1-pro"
        version = "latest"
    }
 
    os_disk {
        caching = "ReadWrite"
-       storage_account_type = "Standard_LRS"
+       storage_account_type = "StandardSSD_LRS"
    }
 }
 
@@ -73,6 +73,17 @@ resource "azurerm_virtual_machine_extension" "streamer-bginfo" {
   type_handler_version = "2.1"  
   depends_on           = [azurerm_virtual_machine_extension.streamer-customscript]
 }
+
+resource "azurerm_virtual_machine_extension" "streamer-nvidia" {
+  count = var.vm_to_create
+  name                 = "NvidiaGpuDriverWindows"
+  virtual_machine_id = azurerm_windows_virtual_machine.streamer[count.index].id
+  publisher            = "Microsoft.HpcCompute"
+  type                 = "NvidiaGpuDriverWindows"
+  type_handler_version = "1.3"  
+  depends_on           = [azurerm_virtual_machine_extension.streamer-bginfo]
+}
+
 
 resource "azurerm_virtual_machine_extension" "streamer-customscript" {
   count = var.vm_to_create

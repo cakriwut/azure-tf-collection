@@ -17,7 +17,7 @@ variable "vm_base_name" {
 
 variable "vm_size" {
    description = "VM size"
-   default = "Standard_B4ms"
+   default = "Standard_NV12_Promo"
 }
 
 variable "admin_username" {
