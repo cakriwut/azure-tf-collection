@@ -41,20 +41,20 @@ resource "azurerm_windows_virtual_machine" "streamer" {
 
    custom_data = filebase64("init.ps1")
 
-#    additional_unattend_content {
-#         setting = "AutoLogon"
-#         content = data.template_file.auto_logon.rendered
-#    }
+   additional_unattend_content {
+        setting = "AutoLogon"
+        content = data.template_file.auto_logon.rendered
+   }
 
-#    additional_unattend_content {
-#         setting = "FirstLogonCommands"
-#         content = data.template_file.first_logon_command.rendered
-#    }
+   additional_unattend_content {
+        setting = "FirstLogonCommands"
+        content = data.template_file.first_logon_command.rendered
+   }
 
    source_image_reference {
-       publisher = "MicrosoftWindowsServer"
-       offer = "WindowsServer"
-       sku = "2019-Datacenter"
+       publisher = "MicrosoftWindowsDesktop"
+       offer = "windows-10-2004-vhd-client-office-prod-stage"
+       sku = "20h1-evd-o365pp"
        version = "latest"
    }
 
