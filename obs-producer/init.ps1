@@ -24,40 +24,61 @@ if($interactive -eq $false) {
     $chocoPackages = 'skype','obs-studio','obs-ndi','git'
 
     foreach($pkg in $chocoPackages){
-        Invoke-Command -ScriptBlock { choco install $args[0] -y } -ArgumentList $pkg
+        Start-Job -ScriptBlock { choco install $args[0] -y } -ArgumentList $pkg 
     }
 
     $source = "https://aka.ms/vs/16/release/vc_redist.x64.exe"
     $target = Output-Folder -fileUrl $source
-    Invoke-WebRequest $source -OutFile $target
-    $cmd = "$target /quiet /install /log $target.log"
-    Invoke-Expression($cmd)
+        Invoke-WebRequest $source -OutFile $target -UseBasicParsing
+        $arguments = "/quiet /install /log $target.log"
+        $cmd = "$target $arguments"
+        #Invoke-Expression($cmd)
+        Start-Process $target -ArgumentList $arguments -Wait 
 
 
-    $source = "https://github.com/ykhwong/ppt-ndi/releases/download/1.0.4/pptndi_setup.exe"
-    $target = Output-Folder -fileUrl $source
-    Invoke-WebRequest $source -OutFile $target
-    $cmd = "$target /silent /allusers /log $target.log"
-    Invoke-Expression($cmd)
+        $source = "https://github.com/ykhwong/ppt-ndi/releases/download/1.0.4/pptndi_setup.exe"
+        $target = Output-Folder -fileUrl $source
+        Invoke-WebRequest $source -OutFile $target -UseBasicParsing
+        $arguments = "/silent /allusers /log $target.log"
+        $cmd = "$target $arguments"
+        #Invoke-Expression($cmd)
+        Start-Process $target -ArgumentList $arguments -Wait 
+    
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 
-    $response = Invoke-WebRequest http://mkto-q0143.com/gn0Uraf0s30qVC0MQ000t6c
-    $startUrl = $response.RawContent.IndexOf('http');
-    $endUrl = $response.RawContent.IndexOf("';",$startUrl);
-    $dynamicFileurl = $response.RawContent.SubString($startUrl,$endUrl-$startUrl)
-    $target = Output-Folder -fileUrl "NdiTools.exe"
-    Invoke-WebRequest $dynamicFileurl -OutFile $target
-    $cmd = "$target /silent /log=$target.log"
-    Invoke-Expression($cmd) 
+    Get-Job | Wait-Job
 
 } else {
-    
-    & choco --% install microsoft-teams -y
-
+            
     $source = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip"
     $target = Output-Folder -fileUrl $source
-    Invoke-WebRequest $source -OutFile $target
+    Invoke-WebRequest $source -OutFile $target -UseBasicParsing
     Expand-Archive $target -DestinationPath $target.Replace(".zip","") -Force
     $cmd = Join-Path ($target.Replace(".zip","")) "VBCABLE_Setup_x64.exe "
-    Invoke-Expression($cmd)
+    Invoke-Expression($cmd)       
 
+    Start-Process https://github.com/cakriwut/azure-tf-collection/blob/master/README.md
+
+    choco install microsoft-teams -y   
+
+    
+    #$result = Invoke-WebRequest http://mkto-q0143.com/gn0Uraf0s30qVC0MQ000t6c -UseBasicParsing
+    $webclient = new-object System.Net.WebClient
+    $resultText = $webclient.DownloadString("http://mkto-q0143.com/gn0Uraf0s30qVC0MQ000t6c")
+
+    $startUrl = $resultText.IndexOf('http');
+    $endUrl = $resultText.IndexOf("';",$startUrl);
+    $dynamicFileurl = $resultText.SubString($startUrl,$endUrl-$startUrl)
+    $target = Output-Folder -fileUrl "NdiTools.exe"
+    Invoke-WebRequest $dynamicFileurl -OutFile $target -UseBasicParsing
+    $arguments = "/verysilent /supressmsgboxes /log=$target.log" 
+    $cmd = "$target $arguments"    
+    #Invoke-Expression($cmd)        
+    Start-Process $target -ArgumentList $arguments -Wait   
+   
+    $source = "https://aka.ms/wsl-ubuntu-1804"
+    $target = "$(Output-Folder -fileUrl $source).appx"
+    Invoke-WebRequest $source -OutFile $target -UseBasicParsing
+    Add-AppxPackage -Path $target    
+    
 }
